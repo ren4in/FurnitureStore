@@ -1,0 +1,5 @@
+@FurnitureStore_HostAddress = http://192.168.1.3
+GET {{FurnitureStore_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
