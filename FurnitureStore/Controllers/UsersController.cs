@@ -125,7 +125,7 @@ namespace FurnitureStore.Controllers
             var identity = GetIdentity(username, password);
             if (identity == null)
             {
-                return BadRequest(new { errorText = "Неправильный логин или пароль" });
+                return new UnauthorizedResult();
             }
 
             var now = DateTime.UtcNow;
