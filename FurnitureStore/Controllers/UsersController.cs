@@ -27,10 +27,10 @@ namespace FurnitureStore.Controllers
 
         // GET: api/Users
         [HttpGet]
-        [Authorize(Roles ="Администратор")]
+       [Authorize(Roles ="Администратор")]
         public async Task<ActionResult<IEnumerable<User>>> GetUsers()
         {
-             return await _context.Users.Include(r=>r.IdRoleNavigation).ToListAsync();
+             return await _context.Users.Include(r=>r.IdRoleNavigation).Include(d=>d.IdDepartmentNavigation).Include(p=>p.IdPositionNavigation).ToListAsync();
         }
 
         // GET: api/Users/5
@@ -47,8 +47,20 @@ namespace FurnitureStore.Controllers
             return user;
         }
 
-//authorization 
-     [HttpGet("auth")]
+
+
+        //search with email 
+        [HttpGet("email")]
+ //       [Authorize(Roles = "Администратор")]
+
+        public async Task<ActionResult<IEnumerable<User>>> GetUsers(string email)
+        {
+            return await _context.Users.Where(u=>u.Login.ToLower().Contains(email.ToLower())).Include(r => r.IdRoleNavigation).Include(d => d.IdDepartmentNavigation).Include(p => p.IdPositionNavigation).ToListAsync();
+        }
+
+
+        //authorization 
+        [HttpGet("auth")]
         public async Task<ActionResult<User>> GetUser(string email, string password)
         {
               var user = await _context.Users.Include(p=>p.IdRoleNavigation).FirstOrDefaultAsync(p => p.Login==email && p.Password==password);
@@ -104,6 +116,7 @@ namespace FurnitureStore.Controllers
 
         // DELETE: api/Users/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Администратор")]
         public async Task<IActionResult> DeleteUser(int id)
         {
             var user = await _context.Users.FindAsync(id);
