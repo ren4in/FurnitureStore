@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using FurnitureStore.db;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FurnitureStore.Controllers
 {
@@ -22,6 +23,7 @@ namespace FurnitureStore.Controllers
 
         // GET: api/Departments
         [HttpGet]
+         [Authorize(Roles = "Администратор")]
         public async Task<ActionResult<IEnumerable<Department>>> GetDepartments()
         {
             return await _context.Departments.ToListAsync();

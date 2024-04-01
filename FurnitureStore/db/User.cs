@@ -29,7 +29,7 @@ public partial class User
 
     public decimal? Salary { get; set; }
 
-    public decimal? Prize { get; set; }
+   
 
     public virtual Department? IdDepartmentNavigation { get; set; } = null!;
 

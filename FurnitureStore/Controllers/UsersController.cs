@@ -51,7 +51,7 @@ namespace FurnitureStore.Controllers
 
         //search with email 
         [HttpGet("email")]
- //       [Authorize(Roles = "Администратор")]
+      [Authorize(Roles = "Администратор")]
 
         public async Task<ActionResult<IEnumerable<User>>> GetUsers(string email)
         {
@@ -106,6 +106,8 @@ namespace FurnitureStore.Controllers
         // POST: api/Users
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+       [Authorize(Roles = "Администратор")]
+
         public async Task<ActionResult<User>> PostUser(User user)
         {
             _context.Users.Add(user);

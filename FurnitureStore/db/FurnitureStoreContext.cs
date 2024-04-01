@@ -422,7 +422,7 @@ public partial class FurnitureStoreContext : DbContext
             entity.Property(e => e.PhoneNumber)
                 .HasMaxLength(20)
                 .HasColumnName("Phone_Number");
-            entity.Property(e => e.Prize).HasColumnType("money");
+       //     entity.Property(e => e.Prize).HasColumnType("money");
             entity.Property(e => e.Salary).HasColumnType("money");
             entity.Property(e => e.Sex)
                 .HasMaxLength(1)
