@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using FurnitureStore.db;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FurnitureStore.Controllers
 {
@@ -22,44 +23,45 @@ namespace FurnitureStore.Controllers
 
         // GET: api/M2mProductPurchase
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<M2mProductPurchase>>> GetM2mProductPurchases()
+        public async Task<ActionResult<IEnumerable<M2mProductPurchase>>> GetM2mProductPurchase()
         {
-            return await _context.M2mProductPurchases.ToListAsync();
+            return await _context.M2mProductPurchases.Where(p=> p.Amount>0).ToListAsync();
         }
 
         // GET: api/M2mProductPurchase/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<M2mProductPurchase>> GetM2mProductPurchase(int id)
+        [HttpGet("id")]
+        [Authorize(Roles = "Продавец")]
+
+        public async Task<ActionResult<IEnumerable<M2mProductPurchase>>> GetM2mProductPurchases(int id)
         {
-            var m2mProductPurchase = await _context.M2mProductPurchases.FindAsync(id);
+            var m2mProductPurchase = await _context.M2mProductPurchases.Where(p => p.IdPurchase == id).Include(p=>p.IdProductNavigation).ToListAsync();
 
             if (m2mProductPurchase == null)
             {
                 return NotFound();
             }
-
             return m2mProductPurchase;
+
         }
 
         // PUT: api/M2mProductPurchase/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutM2mProductPurchase(int id, M2mProductPurchase m2mProductPurchase)
+        [HttpPut()]
+        [Authorize(Roles = "Продавец")]
+
+        public async Task<IActionResult> PutM2mProductPurchase(int idProduct, int idPurchase, int amount)
         {
-            if (id != m2mProductPurchase.IdProduct)
-            {
-                return BadRequest();
-            }
 
-            _context.Entry(m2mProductPurchase).State = EntityState.Modified;
 
+            var m2mProductPurchase = await _context.M2mProductPurchases.FirstOrDefaultAsync(p => p.IdProduct == idProduct && p.IdPurchase == idPurchase);
+            m2mProductPurchase.Amount = amount;
             try
             {
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!M2mProductPurchaseExists(id))
+                if (!M2mProductPurchaseExists(idProduct))
                 {
                     return NotFound();
                 }
@@ -75,6 +77,8 @@ namespace FurnitureStore.Controllers
         // POST: api/M2mProductPurchase
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
+        [Authorize(Roles = "Продавец")]
+
         public async Task<ActionResult<M2mProductPurchase>> PostM2mProductPurchase(M2mProductPurchase m2mProductPurchase)
         {
             _context.M2mProductPurchases.Add(m2mProductPurchase);
@@ -98,14 +102,17 @@ namespace FurnitureStore.Controllers
         }
 
         // DELETE: api/M2mProductPurchase/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteM2mProductPurchase(int id)
+        [HttpDelete]
+        [Authorize(Roles = "Продавец")]
+
+        public async Task<IActionResult> DeleteM2mProductPurchase(int idProduct, int idPurchase)
         {
-            var m2mProductPurchase = await _context.M2mProductPurchases.FindAsync(id);
+            var m2mProductPurchase = await _context.M2mProductPurchases.FirstOrDefaultAsync(p=>p.IdProduct==idProduct && p.IdPurchase==idPurchase);
             if (m2mProductPurchase == null)
             {
                 return NotFound();
             }
+
 
             _context.M2mProductPurchases.Remove(m2mProductPurchase);
             await _context.SaveChangesAsync();

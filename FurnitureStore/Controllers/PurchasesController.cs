@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using FurnitureStore.db;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FurnitureStore.Controllers
 {
@@ -22,13 +23,35 @@ namespace FurnitureStore.Controllers
 
         // GET: api/Purchases
         [HttpGet]
+
         public async Task<ActionResult<IEnumerable<Purchase>>> GetPurchases()
         {
             return await _context.Purchases.ToListAsync();
         }
 
-        // GET: api/Purchases/5
-        [HttpGet("{id}")]
+        [HttpGet("id_customer")]
+
+        [Authorize(Roles = "Продавец")]
+
+        public async Task<ActionResult<IEnumerable<Purchase>>> GetPurchase_Customer(int id_customer)
+        {
+            return await _context.Purchases.Include(c => c.IdCustomerNavigation).Where(p => p.IdCustomerNavigation.IdCustomer==id_customer).ToListAsync();
+        }
+
+       [HttpGet("{id_customer}/{id_Purchase}")]
+
+        [Authorize(Roles = "Продавец")]
+
+        public async Task<ActionResult<IEnumerable<Purchase>>> GetPurchase_Customer(int id_customer, int id_Purchase)
+        {
+            return await _context.Purchases.Include(c => c.IdCustomerNavigation).Where(p => p.IdCustomerNavigation.IdCustomer == id_customer && p.IdPurchase==id_Purchase).ToListAsync();
+
+        }
+
+            // GET: api/Purchases/5
+            [HttpGet("{id}")]
+
+        [Authorize(Roles = "Продавец")]
         public async Task<ActionResult<Purchase>> GetPurchase(int id)
         {
             var purchase = await _context.Purchases.FindAsync(id);
@@ -44,6 +67,8 @@ namespace FurnitureStore.Controllers
         // PUT: api/Purchases/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+
+        [Authorize(Roles = "Продавец")]
         public async Task<IActionResult> PutPurchase(int id, Purchase purchase)
         {purchase.IdPurchase = id;
             if (id != purchase.IdPurchase)
@@ -85,6 +110,8 @@ namespace FurnitureStore.Controllers
 
         // DELETE: api/Purchases/5
         [HttpDelete("{id}")]
+
+        [Authorize(Roles = "Продавец")]
         public async Task<IActionResult> DeletePurchase(int id)
         {
             var purchase = await _context.Purchases.FindAsync(id);

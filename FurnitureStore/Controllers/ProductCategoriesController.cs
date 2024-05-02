@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using FurnitureStore.db;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FurnitureStore.Controllers
 {
@@ -22,6 +23,8 @@ namespace FurnitureStore.Controllers
 
         // GET: api/ProductCategories
         [HttpGet]
+        [Authorize(Roles = "Продавец")]
+
         public async Task<ActionResult<IEnumerable<ProductCategory>>> GetProductCategories()
         {
             return await _context.ProductCategories.ToListAsync();

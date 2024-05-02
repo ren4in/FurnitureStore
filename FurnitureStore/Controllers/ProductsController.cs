@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using FurnitureStore.db;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FurnitureStore.Controllers
 {
@@ -21,10 +22,32 @@ namespace FurnitureStore.Controllers
         }
 
         // GET: api/Products
-        [HttpGet]
+      [HttpGet("api/GetProducts")]
+        [Authorize(Roles = "Продавец")]
+
         public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
         {
-            return await _context.Products.ToListAsync();
+            //     return await _context.Products.Where(p => p.IdProduct==1).ToListAsync();
+                  return await _context.Products.Include(p=>p.IdProductCategoryNavigation).ToListAsync();
+
+        }
+        [HttpGet("api/GetProductsNoPhoto")]
+        [Authorize(Roles = "Продавец")]
+
+        public async Task<ActionResult<IEnumerable<Product>>> GetProductsNoPhoto()
+        {
+            //     return await _context.Products.Where(p => p.IdProduct==1).ToListAsync();
+            return   await _context.Products
+        .Include(p => p.IdProductCategoryNavigation)
+        .Where(p=>p.Amount>0).Select(p => new Product
+        {
+            IdProduct = p.IdProduct,
+            ProductName = p.ProductName,
+            Amount = p.Amount,
+            // Остальные столбцы будут проигнорированы
+        })
+        .ToListAsync();
+
         }
 
         // GET: api/Products/5

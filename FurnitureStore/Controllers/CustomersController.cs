@@ -28,6 +28,17 @@ namespace FurnitureStore.Controllers
         {
             return await _context.Customers.ToListAsync();
         }
+        [HttpGet("email")]
+        [Authorize(Roles = "Продавец")]
+
+        public async Task<ActionResult<IEnumerable<Customer>>> GetCustomers(string email)
+        {
+            
+            return await _context.Customers.Where(u => u.EMail.ToLower().Contains(email.ToLower())).ToListAsync();
+       
+
+        }
+
 
         // GET: api/Customers/5
         [HttpGet("{id}")]
@@ -98,7 +109,9 @@ namespace FurnitureStore.Controllers
         }
 
         // DELETE: api/Customers/5
+       
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Продавец")]
         public async Task<IActionResult> DeleteCustomer(int id)
         {
             var customer = await _context.Customers.FindAsync(id);

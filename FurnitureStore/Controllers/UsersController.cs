@@ -52,7 +52,7 @@ namespace FurnitureStore.Controllers
 
         //search with email 
         [HttpGet("email")]
-      [Authorize(Roles = "Администратор")]
+      [Authorize(Roles =   "Администратор")]
 
         public async Task<ActionResult<IEnumerable<User>>> GetUsers(string email)
         {
@@ -76,7 +76,7 @@ namespace FurnitureStore.Controllers
         // PUT: api/Users/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        [Authorize(Roles = "Администратор")]
+        [Authorize(Roles = "Администратор, Продавец") ]
 
         public async Task<IActionResult> PutUser(int id, User user)
         {user.IdUser = id;
@@ -156,12 +156,14 @@ namespace FurnitureStore.Controllers
                     expires: now.Add(TimeSpan.FromMinutes(AuthOptions.LIFETIME)),
                     signingCredentials: new SigningCredentials(AuthOptions.GetSymmetricSecurityKey(), SecurityAlgorithms.HmacSha256));
             var encodedJwt = new JwtSecurityTokenHandler().WriteToken(jwt);
-
+            var userId = identity.FindFirst("IdUser")?.Value; // Получаем идентификатор пользователя из Claims
             var response = new
             {
                 access_token = encodedJwt,
+            
                 username = identity.Name,
-                 role = identity.FindFirst(ClaimsIdentity.DefaultRoleClaimType)?.Value
+                 role = identity.FindFirst(ClaimsIdentity.DefaultRoleClaimType)?.Value,
+                IdUser = userId // Добавляем идентификатор пользователя в ответ
             };
 
             return new JsonResult(response);
@@ -175,7 +177,9 @@ namespace FurnitureStore.Controllers
                 var claims = new List<Claim>
                 {
                     new Claim(ClaimsIdentity.DefaultNameClaimType, user.Login),
-                    new Claim(ClaimsIdentity.DefaultRoleClaimType, user.IdRoleNavigation.RoleName)
+                     
+                    new Claim(ClaimsIdentity.DefaultRoleClaimType, user.IdRoleNavigation.RoleName),
+                    new Claim("IdUser", user.IdUser.ToString()) // Добавляем Claim с идентификатором пользователя
                 };
                 ClaimsIdentity claimsIdentity =
                 new ClaimsIdentity(claims, "Token", ClaimsIdentity.DefaultNameClaimType,

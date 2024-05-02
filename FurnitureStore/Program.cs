@@ -57,7 +57,10 @@ builder.Services.AddDbContext<FurnitureStoreContext>(opt =>
  
      
     // opt.UseInMemoryDatabase("Store");
-  opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+  opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"), opt =>
+  {
+      opt.CommandTimeout(60);
+  });
     });
 var app = builder.Build();
 
