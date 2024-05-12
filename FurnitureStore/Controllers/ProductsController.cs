@@ -23,7 +23,7 @@ namespace FurnitureStore.Controllers
 
         // GET: api/Products
       [HttpGet("api/GetProducts")]
-        [Authorize(Roles = "Продавец")]
+        [Authorize(Roles = "Продавец, Администратор")]
 
         public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
         {
@@ -32,7 +32,7 @@ namespace FurnitureStore.Controllers
 
         }
         [HttpGet("api/GetProductsNoPhoto")]
-        [Authorize(Roles = "Продавец")]
+        [Authorize(Roles = "Продавец, Администратор")]
 
         public async Task<ActionResult<IEnumerable<Product>>> GetProductsNoPhoto()
         {

@@ -21,9 +21,11 @@ namespace FurnitureStore.Controllers
             _context = context;
         }
 
+
+
         // GET: api/ProductCategories
         [HttpGet]
-        [Authorize(Roles = "Продавец")]
+   //     [Authorize(Roles = "Продавец, Администратор")]
 
         public async Task<ActionResult<IEnumerable<ProductCategory>>> GetProductCategories()
         {
